@@ -4,20 +4,37 @@ app.use(express.json()); // Parse JSON bodies
 
 let todos = [
   { id: 1, task: 'Learn Node.js', completed: false },
-  { id: 2, task: 'Build CRUD API', completed: false },
+  { id: 2, task: 'Build CRUD API', completed: true },
+  { id: 3, task: 'Test API', completed: true },
+  { id: 4, task: 'Deploy API', completed: false },
+  { id: 5, task: 'Document API', completed: false },
 ];
 
-// GET All – Read
-app.get('/todos', (req, res) => {
-  res.status(200).json(todos); // Send array as JSON
+// GET Completed Todos
+app.get('/todos/completed', (req, res) => {
+    const completedTodos = todos.filter((todo) => todo.completed === true);
+    res.json(completedTodos);
+});
+
+
+// GET by ID – Read
+app.get('/todos/:id', (req, res) => {
+  const todo = todos.find((t) => t.id === parseInt(req.params.id)); // Send a single todo as JSON
+  if (!todo) return res.status(404).json({ message: 'Todo not found' });
+  res.json(todo);
 });
 
 // POST New – Create
 app.post('/todos', (req, res) => {
-  const newTodo = { id: todos.length + 1, ...req.body }; // Auto-ID
+  const { task, completed } = req.body;
+  if (!task || typeof completed !== 'boolean') {    // Validate input
+    return res.status(400).json({ error: 'A field is missing or has an invalid type' });
+  }
+  const newTodo = { id: todos.length + 1, ...req.body};
   todos.push(newTodo);
   res.status(201).json(newTodo); // Echo back
 });
+
 
 // PATCH Update – Partial
 app.patch('/todos/:id', (req, res) => {
@@ -46,5 +63,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Server error!' });
 });
 
-const PORT = 3002;
+const PORT = process.env.PORT || 3000; 
+
 app.listen(PORT, () => console.log(`Server on port ${PORT}`));
