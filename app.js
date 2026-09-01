@@ -16,6 +16,13 @@ app.get('/todos/completed', (req, res) => {
     res.json(completedTodos);
 });
 
+app.get('/', (req, res) => {
+  res.send('Welcome to the Todo API! Use /todos to access the list of todos.');
+});
+
+app.get('/todos', (req, res) => {
+  res.json(todos); // Send all todos as JSON
+});
 
 // GET by ID – Read
 app.get('/todos/:id', (req, res) => {
